@@ -1,0 +1,2135 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OKRsMatter</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --bg: #f5f1ea;
+        --bg-accent: #d7d0c8;
+        --ink: #1a1a1a;
+        --muted: #5c5c5c;
+        --brand: #2b5f75;
+        --brand-light: #6aa0b6;
+        --card: #fffdf9;
+        --border: #d9d2c7;
+        --shadow: 0 24px 60px rgba(0, 0, 0, 0.12);
+        --radius: 18px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: 'Space Grotesk', sans-serif;
+        background: radial-gradient(circle at top, #f7f0e5 0%, #efe9e1 55%, #e2dcd3 100%);
+        color: var(--ink);
+      }
+
+      .page {
+        min-height: 100vh;
+        padding: 32px 16px 48px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+
+      header {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+      }
+
+      h1 {
+        font-family: 'Fraunces', serif;
+        font-size: clamp(2.4rem, 4vw, 3.8rem);
+        margin: 0;
+        letter-spacing: -0.02em;
+      }
+
+      .subtitle {
+        color: var(--muted);
+        font-size: 1.05rem;
+        max-width: 640px;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+        gap: 24px;
+      }
+
+      .panel {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 20px;
+        box-shadow: var(--shadow);
+        animation: fadeIn 450ms ease;
+      }
+
+      .panel h2 {
+        margin: 0 0 12px;
+        font-size: 1.2rem;
+      }
+
+      .filters label,
+      .form label {
+        display: block;
+        font-size: 0.9rem;
+        margin-bottom: 6px;
+        color: var(--muted);
+      }
+
+      select,
+      input,
+      textarea {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: #fff;
+        font-family: inherit;
+      }
+
+      textarea {
+        min-height: 84px;
+        resize: vertical;
+      }
+
+      .filters {
+        display: grid;
+        gap: 12px;
+      }
+
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85rem;
+        background: #e6eef2;
+        color: var(--brand);
+        padding: 4px 10px;
+        border-radius: 999px;
+      }
+
+      .cards {
+        display: grid;
+        gap: 16px;
+      }
+
+      .dashboard {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 12px;
+      }
+
+      .summary-card {
+        background: linear-gradient(140deg, #ffffff, #f4efe7);
+        border-radius: 16px;
+        padding: 14px;
+        border: 1px solid var(--border);
+        display: grid;
+        gap: 6px;
+      }
+
+      .summary-card h3 {
+        margin: 0;
+        font-size: 0.95rem;
+        color: var(--muted);
+      }
+
+      .summary-card .value {
+        font-size: 1.6rem;
+        font-weight: 600;
+      }
+
+      .summary-card .detail {
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+
+      .trend {
+        display: grid;
+        gap: 12px;
+      }
+
+      .trend-bars {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+        gap: 8px;
+        align-items: end;
+      }
+
+      .trend-bar {
+        background: #e9e3da;
+        border-radius: 12px;
+        padding: 10px;
+        display: grid;
+        gap: 6px;
+        text-align: center;
+      }
+
+      .trend-bar .bar {
+        height: 80px;
+        background: #f4efe7;
+        border-radius: 8px;
+        display: flex;
+        align-items: flex-end;
+        overflow: hidden;
+      }
+
+      .trend-bar .fill {
+        width: 100%;
+        background: linear-gradient(180deg, #2b5f75, #6aa0b6);
+        border-radius: 8px 8px 4px 4px;
+        transition: height 250ms ease;
+      }
+
+      .stack-bar {
+        height: 84px;
+        border-radius: 10px;
+        overflow: hidden;
+        display: grid;
+        grid-template-rows: auto auto auto;
+        background: #f4efe7;
+      }
+
+      .stack-segment {
+        width: 100%;
+      }
+
+      .stack-on {
+        background: #2b5f75;
+      }
+
+      .stack-risk {
+        background: #d28b55;
+      }
+
+      .stack-off {
+        background: #9b3a1c;
+      }
+
+      .rollups {
+        display: grid;
+        gap: 16px;
+      }
+
+      details.rollup {
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 12px 14px;
+        background: #fff;
+      }
+
+      details.rollup summary {
+        cursor: pointer;
+        font-weight: 600;
+        list-style: none;
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      details.rollup summary::-webkit-details-marker {
+        display: none;
+      }
+
+      details.objective-detail summary {
+        cursor: pointer;
+        list-style: none;
+        font-weight: 600;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      details.objective-detail summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .objective-meta {
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+
+      .objective-krs {
+        display: grid;
+        gap: 8px;
+        margin-top: 8px;
+        padding-left: 8px;
+      }
+
+      .objective-kr {
+        border-left: 2px solid var(--border);
+        padding-left: 8px;
+        font-size: 0.9rem;
+        color: var(--muted);
+      }
+
+      .objective-kr .kr-badge {
+        margin-left: 6px;
+      }
+
+      .objective-kr .kr-badge {
+        margin-left: 6px;
+      }
+
+      .alignment-map {
+        display: grid;
+        gap: 10px;
+      }
+
+      .map-item {
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 12px;
+        background: #fff;
+        display: grid;
+        gap: 8px;
+      }
+
+      .map-branch {
+        display: grid;
+        gap: 6px;
+        padding-left: 12px;
+        border-left: 2px dashed var(--border);
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      .coach {
+        display: grid;
+        gap: 14px;
+      }
+
+      .coach-output {
+        border: 1px dashed var(--border);
+        border-radius: 12px;
+        padding: 12px;
+        background: #fff;
+        display: grid;
+        gap: 10px;
+      }
+
+      .coach-output h3 {
+        margin: 0;
+        font-size: 1rem;
+      }
+
+      .coach-output ul {
+        margin: 0;
+        padding-left: 18px;
+        color: var(--muted);
+      }
+
+      .admin-grid {
+        display: grid;
+        gap: 16px;
+      }
+
+      .rollup-meta {
+        font-weight: 500;
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+
+      .rollup-list {
+        margin-top: 10px;
+        display: grid;
+        gap: 6px;
+        font-size: 0.9rem;
+        color: var(--muted);
+      }
+
+      .rollup-filters {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+
+      .card {
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 16px;
+        background: #fff;
+      }
+
+      .card h3 {
+        margin: 0 0 6px;
+        font-size: 1.15rem;
+      }
+
+      .card p {
+        margin: 0 0 12px;
+        color: var(--muted);
+      }
+
+      .meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .form {
+        display: grid;
+        gap: 12px;
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 10px;
+      }
+
+      .btn {
+        border: none;
+        padding: 12px 16px;
+        border-radius: 999px;
+        background: var(--brand);
+        color: #fff;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 200ms ease, box-shadow 200ms ease;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 14px 28px rgba(43, 95, 117, 0.25);
+      }
+
+      .btn.secondary {
+        background: #fff;
+        color: var(--brand);
+        border: 1px solid var(--brand);
+      }
+
+      .kr-list {
+        margin-top: 12px;
+        border-top: 1px dashed var(--border);
+        padding-top: 12px;
+        display: grid;
+        gap: 8px;
+      }
+
+      .kr-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.9rem;
+        color: var(--muted);
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.8rem;
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: #eef3f6;
+        color: var(--brand);
+        border: 1px solid #d7e3ea;
+      }
+
+      .badge.warn {
+        background: #f7e7df;
+        color: #9b3a1c;
+        border-color: #efcfbf;
+      }
+
+      .badge.on-track {
+        background: #e7f0f4;
+        color: #2b5f75;
+        border-color: #cfe0ea;
+      }
+
+      .badge.at-risk {
+        background: #f7efe5;
+        color: #a1612a;
+        border-color: #edd8c4;
+      }
+
+      .badge.off-track {
+        background: #f6e3dc;
+        color: #8f2f1b;
+        border-color: #efc6ba;
+      }
+
+      .kr-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .status {
+        font-weight: 600;
+      }
+
+      .loading {
+        color: var(--muted);
+        font-style: italic;
+      }
+
+      .hint {
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+
+      .warning {
+        color: #9b3a1c;
+        background: #f7e7df;
+        border-radius: 10px;
+        padding: 6px 10px;
+        font-size: 0.85rem;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 900px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header>
+        <span class="tag">Company OKR Clarity Studio</span>
+        <h1>OKRsMatter</h1>
+        <p class="subtitle">Keep quarterly focus crisp by aligning executive intent with department and team execution. Draft objectives, prioritize impact, and keep the key results grounded in reality.</p>
+      </header>
+
+      <div class="layout">
+        <section class="panel">
+          <h2>Focus Lens</h2>
+          <div class="filters">
+            <div>
+              <label for="level">Level</label>
+              <select id="level">
+                <option value="">All levels</option>
+                <option value="Executive">Executive</option>
+                <option value="Department">Department</option>
+                <option value="Team">Team</option>
+              </select>
+            </div>
+            <div>
+              <label for="quarter">Quarter</label>
+              <select id="quarter"></select>
+            </div>
+            <div>
+              <label for="department">Department</label>
+              <select id="department"></select>
+            </div>
+            <div>
+              <label for="team">Team</label>
+              <select id="team"></select>
+            </div>
+            <button class="btn secondary" id="refresh">Refresh view</button>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Create an objective</h2>
+          <form class="form" id="objectiveForm">
+            <div>
+              <label for="title">Objective title</label>
+              <input id="title" name="title" placeholder="e.g. Expand enterprise readiness" required>
+            </div>
+            <div>
+              <label for="description">Objective description</label>
+              <textarea id="description" name="description" placeholder="Describe the outcome and scope." required></textarea>
+            </div>
+            <div>
+              <label for="rationale">Why now?</label>
+              <textarea id="rationale" name="rationale" placeholder="Explain the strategic reason this quarter." required></textarea>
+            </div>
+            <div class="form-row">
+              <div>
+                <label for="levelSelect">Level</label>
+                <select id="levelSelect" name="level" required>
+                  <option value="Executive">Executive</option>
+                  <option value="Department">Department</option>
+                  <option value="Team">Team</option>
+                </select>
+              </div>
+              <div>
+                <label for="quarterSelect">Quarter</label>
+                <select id="quarterSelect" name="quarter" required></select>
+              </div>
+            </div>
+            <div id="parentWrapper">
+              <label for="parentSelect">Parent objective</label>
+              <select id="parentSelect" name="parentId"></select>
+              <p class="hint">Department objectives map to executive objectives. Team objectives map to department objectives.</p>
+            </div>
+            <div class="form-row">
+              <div>
+                <label for="priority">Priority (1-5)</label>
+                <input id="priority" name="priority" type="number" min="1" max="5" value="3">
+              </div>
+              <div>
+                <label for="impact">Impact (1-5)</label>
+                <input id="impact" name="impact" type="number" min="1" max="5" value="3">
+              </div>
+              <div>
+                <label for="progress">Progress %</label>
+                <input id="progress" name="progress" type="number" min="0" max="100" value="0">
+              </div>
+            </div>
+            <div class="form-row">
+              <div>
+                <label for="departmentInput">Department</label>
+                <input id="departmentInput" name="department" placeholder="e.g. Product">
+              </div>
+              <div>
+                <label for="teamInput">Team</label>
+                <input id="teamInput" name="team" placeholder="e.g. Platform">
+              </div>
+            </div>
+            <button class="btn" type="submit">Add objective</button>
+          </form>
+        </section>
+      </div>
+
+      <section class="panel">
+        <h2>Dashboard summary</h2>
+        <div class="dashboard" id="dashboardSummary">
+          <p class="loading">Loading summary...</p>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Weekly trend</h2>
+        <div class="trend" id="trendSummary">
+          <p class="loading">Loading trend...</p>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Confidence trend</h2>
+        <div class="trend" id="confidenceTrend">
+          <p class="loading">Loading confidence trend...</p>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Department rollups</h2>
+        <div class="rollup-filters">
+          <div>
+            <label for="rollupQuarter">Quarter</label>
+            <select id="rollupQuarter"></select>
+          </div>
+          <div>
+            <label for="rollupLevel">Objective level</label>
+            <select id="rollupLevel">
+              <option value="">All levels</option>
+              <option value="Executive">Executive</option>
+              <option value="Department">Department</option>
+              <option value="Team">Team</option>
+            </select>
+          </div>
+          <div>
+            <label>&nbsp;</label>
+            <button class="btn secondary" id="exportRollups" type="button">Export rollups to Sheet</button>
+          </div>
+        </div>
+        <div class="rollups" id="departmentRollups">
+          <p class="loading">Loading rollups...</p>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Team rollups</h2>
+        <div class="rollups" id="teamRollups">
+          <p class="loading">Loading rollups...</p>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Alignment map</h2>
+        <div class="alignment-map" id="alignmentMap">
+          <p class="loading">Loading alignment map...</p>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>AI coach</h2>
+        <div class="coach">
+          <form class="form" id="coachForm">
+            <div>
+              <label for="coachObjective">Objective</label>
+              <select id="coachObjective" name="objectiveId" required></select>
+            </div>
+            <div class="form-row">
+              <div>
+                <label for="coachProvider">Provider</label>
+                <select id="coachProvider" name="provider" required>
+                  <option value="openai">OpenAI</option>
+                  <option value="anthropic">Anthropic</option>
+                </select>
+              </div>
+              <div>
+                <label for="coachModel">Model</label>
+                <input id="coachModel" name="model" placeholder="e.g. gpt-4o-mini">
+              </div>
+            </div>
+            <button class="btn" type="submit">Get coaching</button>
+            <p class="hint" id="coachKeyHint"></p>
+          </form>
+
+          <form class="form" id="aiSettingsForm">
+            <h3>AI settings</h3>
+            <div class="form-row">
+              <div>
+                <label for="openaiKey">OpenAI API key</label>
+                <input id="openaiKey" name="openaiKey" type="password" placeholder="sk-...">
+              </div>
+              <div>
+                <label for="anthropicKey">Anthropic API key</label>
+                <input id="anthropicKey" name="anthropicKey" type="password" placeholder="sk-ant-...">
+              </div>
+            </div>
+            <div class="form-row">
+              <div>
+                <label for="openaiModel">OpenAI model</label>
+                <input id="openaiModel" name="openaiModel" placeholder="e.g. gpt-4o-mini">
+              </div>
+              <div>
+                <label for="anthropicModel">Anthropic model</label>
+                <input id="anthropicModel" name="anthropicModel" placeholder="e.g. claude-3-5-sonnet-20240620">
+              </div>
+            </div>
+            <button class="btn secondary" type="submit">Save AI settings</button>
+            <p class="hint">Keys are stored in Script Properties for this Apps Script project.</p>
+          </form>
+
+          <div class="coach-output" id="coachOutput">
+            <p class="loading">Coaching output will appear here.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="adminPanel" style="display: none;">
+        <h2>Admin</h2>
+        <div class="admin-grid">
+          <form class="form" id="userAdminForm">
+            <h3>User management</h3>
+            <div>
+              <label for="adminUserSelect">User</label>
+              <select id="adminUserSelect" name="email"></select>
+            </div>
+            <div>
+              <label for="adminUserEmail">Or add user by email</label>
+              <input id="adminUserEmail" name="emailInput" type="email" placeholder="name@company.com">
+            </div>
+            <div class="form-row">
+              <div>
+                <label for="adminUserName">Name</label>
+                <input id="adminUserName" name="name" placeholder="Full name">
+              </div>
+              <div>
+                <label for="adminUserRole">Role</label>
+                <select id="adminUserRole" name="role">
+                  <option value="member">Member</option>
+                  <option value="team">Team</option>
+                  <option value="department">Department</option>
+                  <option value="exec">Exec</option>
+                  <option value="operations">Operations</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div>
+                <label for="adminUserDepartment">Department</label>
+                <input id="adminUserDepartment" name="department" placeholder="e.g. Product">
+              </div>
+              <div>
+                <label for="adminUserTeam">Team</label>
+                <input id="adminUserTeam" name="team" placeholder="e.g. Platform">
+              </div>
+            </div>
+            <div class="form-row">
+              <button class="btn" type="submit">Update user</button>
+              <button class="btn secondary" type="button" id="deleteUser">Delete user</button>
+            </div>
+          </form>
+
+          <form class="form" id="orgAdminForm">
+            <h3>Department / Team setup</h3>
+            <div class="form-row">
+              <div>
+                <label for="adminDepartmentName">Department name</label>
+                <input id="adminDepartmentName" name="departmentName" placeholder="e.g. Engineering">
+              </div>
+              <div>
+                <label for="adminDepartmentLead">Department lead email</label>
+                <input id="adminDepartmentLead" name="departmentLead" type="email">
+              </div>
+            </div>
+            <div class="form-row">
+              <button class="btn secondary" type="button" id="saveDepartment">Save department</button>
+              <button class="btn secondary" type="button" id="deleteDepartment">Delete department</button>
+            </div>
+            <div class="form-row">
+              <div>
+                <label for="adminTeamName">Team name</label>
+                <input id="adminTeamName" name="teamName" placeholder="e.g. Platform">
+              </div>
+              <div>
+                <label for="adminTeamDepartment">Team department</label>
+                <input id="adminTeamDepartment" name="teamDepartment" placeholder="e.g. Engineering">
+              </div>
+              <div>
+                <label for="adminTeamLead">Team lead email</label>
+                <input id="adminTeamLead" name="teamLead" type="email">
+              </div>
+            </div>
+            <div class="form-row">
+              <button class="btn secondary" type="button" id="saveTeam">Save team</button>
+              <button class="btn secondary" type="button" id="deleteTeam">Delete team</button>
+            </div>
+          </form>
+
+          <form class="form" id="quarterAdminForm">
+            <h3>Quarter setup</h3>
+            <div class="form-row">
+              <div>
+                <label for="adminQuarterName">Quarter name</label>
+                <input id="adminQuarterName" name="name" placeholder="e.g. Q2 2026">
+              </div>
+              <div>
+                <label for="adminQuarterStart">Start date</label>
+                <input id="adminQuarterStart" name="start" type="date">
+              </div>
+              <div>
+                <label for="adminQuarterEnd">End date</label>
+                <input id="adminQuarterEnd" name="end" type="date">
+              </div>
+              <div>
+                <label for="adminQuarterStatus">Status</label>
+                <select id="adminQuarterStatus" name="status">
+                  <option value="active">Active</option>
+                  <option value="upcoming">Upcoming</option>
+                  <option value="closed">Closed</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <button class="btn secondary" type="submit">Save quarter</button>
+              <button class="btn secondary" type="button" id="deleteQuarter">Delete quarter</button>
+            </div>
+          </form>
+
+          <form class="form" id="settingsAdminForm">
+            <h3>App settings</h3>
+            <div class="form-row">
+              <div>
+                <label for="settingKrCap">KR soft cap</label>
+                <input id="settingKrCap" name="krSoftCap" type="number" min="1">
+              </div>
+              <div>
+                <label for="settingExecCap">Exec objective soft cap</label>
+                <input id="settingExecCap" name="execObjectiveSoftCap" type="number" min="1">
+              </div>
+              <div>
+                <label for="settingTeamCap">Team objective soft cap</label>
+                <input id="settingTeamCap" name="teamObjectiveSoftCap" type="number" min="1">
+              </div>
+            </div>
+            <button class="btn secondary" type="submit">Save settings</button>
+          </form>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Add a key result</h2>
+        <form class="form" id="krForm">
+          <div>
+            <label for="krObjective">Objective</label>
+            <select id="krObjective" name="objectiveId" required></select>
+          </div>
+          <div>
+            <label for="krTitle">Key result</label>
+            <input id="krTitle" name="title" placeholder="e.g. Increase enterprise conversion rate" required>
+          </div>
+          <div class="form-row">
+            <div>
+              <label for="krMetric">Metric</label>
+              <input id="krMetric" name="metric" placeholder="e.g. conversion rate" required>
+            </div>
+            <div>
+              <label for="krBaseline">Baseline</label>
+              <input id="krBaseline" name="baseline" type="number" step="any" required>
+            </div>
+            <div>
+              <label for="krTarget">Target</label>
+              <input id="krTarget" name="target" type="number" step="any" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div>
+              <label for="krCurrent">Current</label>
+              <input id="krCurrent" name="current" type="number" step="any" value="0">
+            </div>
+            <div>
+              <label for="krTimeline">Timeline end</label>
+              <input id="krTimeline" name="timeline" type="date" required>
+            </div>
+            <div>
+              <label for="krConfidence">Confidence</label>
+              <select id="krConfidence" name="confidence" required>
+                <option value="On track">On track</option>
+                <option value="At risk">At risk</option>
+                <option value="Off track">Off track</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn" type="submit">Add key result</button>
+          <p class="hint">Aim for 2–5 key results per objective.</p>
+        </form>
+      </section>
+
+      <section class="panel">
+        <h2>Weekly check-in</h2>
+        <form class="form" id="checkInForm">
+          <div>
+            <label for="checkInKr">Key result</label>
+            <select id="checkInKr" name="keyResultId" required></select>
+          </div>
+          <div class="form-row">
+            <div>
+              <label for="checkInWeek">Week start</label>
+              <input id="checkInWeek" name="weekStart" type="date" required>
+            </div>
+            <div>
+              <label for="checkInCurrent">Current value</label>
+              <input id="checkInCurrent" name="current" type="number" step="any" required>
+            </div>
+            <div>
+              <label for="checkInConfidence">Confidence</label>
+              <select id="checkInConfidence" name="confidence" required>
+                <option value="On track">On track</option>
+                <option value="At risk">At risk</option>
+                <option value="Off track">Off track</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label for="checkInNotes">Notes</label>
+            <textarea id="checkInNotes" name="notes" placeholder="What changed this week?"></textarea>
+          </div>
+          <button class="btn" type="submit">Save check-in</button>
+        </form>
+      </section>
+
+      <section class="panel">
+        <h2>Objectives</h2>
+        <div class="cards" id="objectiveList">
+          <p class="loading">Loading objectives...</p>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      const state = {
+        objectives: [],
+        keyResults: {},
+        keyResultsAll: [],
+        checkIns: [],
+        users: [],
+        appSettings: null,
+        departments: [],
+        teams: [],
+        quarters: [],
+        bootstrap: null
+      };
+
+      const objectiveList = document.getElementById('objectiveList');
+      const quarterSelect = document.getElementById('quarter');
+      const departmentSelect = document.getElementById('department');
+      const teamSelect = document.getElementById('team');
+      const quarterFormSelect = document.getElementById('quarterSelect');
+      const parentWrapper = document.getElementById('parentWrapper');
+      const parentSelect = document.getElementById('parentSelect');
+      const krObjectiveSelect = document.getElementById('krObjective');
+      const checkInKrSelect = document.getElementById('checkInKr');
+      const rollupQuarterSelect = document.getElementById('rollupQuarter');
+      const rollupLevelSelect = document.getElementById('rollupLevel');
+      const exportRollupsButton = document.getElementById('exportRollups');
+      const alignmentMap = document.getElementById('alignmentMap');
+      const coachObjectiveSelect = document.getElementById('coachObjective');
+      const coachModelInput = document.getElementById('coachModel');
+      const coachProviderSelect = document.getElementById('coachProvider');
+      const coachKeyHint = document.getElementById('coachKeyHint');
+      const coachOutput = document.getElementById('coachOutput');
+      const aiSettingsForm = document.getElementById('aiSettingsForm');
+      const adminPanel = document.getElementById('adminPanel');
+      const adminUserSelect = document.getElementById('adminUserSelect');
+      const adminUserEmail = document.getElementById('adminUserEmail');
+      const adminUserName = document.getElementById('adminUserName');
+      const adminUserRole = document.getElementById('adminUserRole');
+      const adminUserDepartment = document.getElementById('adminUserDepartment');
+      const adminUserTeam = document.getElementById('adminUserTeam');
+      const saveDepartmentButton = document.getElementById('saveDepartment');
+      const saveTeamButton = document.getElementById('saveTeam');
+      const deleteUserButton = document.getElementById('deleteUser');
+      const deleteDepartmentButton = document.getElementById('deleteDepartment');
+      const deleteTeamButton = document.getElementById('deleteTeam');
+      const deleteQuarterButton = document.getElementById('deleteQuarter');
+
+      function setSelectOptions(select, options, includeBlank = true) {
+        select.innerHTML = '';
+        if (includeBlank) {
+          const blank = document.createElement('option');
+            blank.value = '';
+          blank.textContent = 'All';
+          select.appendChild(blank);
+        }
+        options.forEach(item => {
+          const option = document.createElement('option');
+          option.value = item;
+          option.textContent = item;
+          select.appendChild(option);
+        });
+      }
+
+      function setUserOptions(select, users) {
+        if (!select) return;
+        select.innerHTML = '';
+        users.forEach(user => {
+          const option = document.createElement('option');
+          option.value = user.email;
+          option.textContent = `${user.name || user.email} (${user.email})`;
+          select.appendChild(option);
+        });
+      }
+
+      function setObjectiveOptions(select, objectives, includeBlank) {
+        select.innerHTML = '';
+        if (includeBlank) {
+          const blank = document.createElement('option');
+          blank.value = '';
+          blank.textContent = 'Select';
+          select.appendChild(blank);
+        }
+        objectives.forEach(obj => {
+          const option = document.createElement('option');
+          option.value = obj.id;
+          option.textContent = `${obj.title} (${obj.level})`;
+          select.appendChild(option);
+        });
+      }
+
+      function setKeyResultOptions(select, keyResults) {
+        select.innerHTML = '';
+        const blank = document.createElement('option');
+        blank.value = '';
+        blank.textContent = 'Select';
+        select.appendChild(blank);
+        keyResults.forEach(kr => {
+          const option = document.createElement('option');
+          const objective = state.objectives.find(obj => obj.id === kr.objectiveId);
+          option.value = kr.id;
+          option.textContent = `${objective ? objective.title : 'Objective'} — ${kr.title}`;
+          select.appendChild(option);
+        });
+      }
+
+      function updateParentOptions() {
+        const level = document.getElementById('levelSelect').value;
+        if (level === 'Executive') {
+          parentWrapper.style.display = 'none';
+          parentSelect.required = false;
+          parentSelect.innerHTML = '';
+          return;
+        }
+        parentWrapper.style.display = 'block';
+        parentSelect.required = true;
+        const parentLevel = level === 'Department' ? 'Executive' : 'Department';
+        const parentObjectives = state.objectives.filter(obj => obj.level === parentLevel);
+        setObjectiveOptions(parentSelect, parentObjectives, true);
+      }
+
+      function renderObjectives() {
+        if (!state.objectives.length) {
+          objectiveList.innerHTML = '<p class="loading">No objectives yet. Create the first one.</p>';
+          renderDashboard();
+          return;
+        }
+
+        const objectiveLookup = state.objectives.reduce((acc, obj) => {
+          acc[obj.id] = obj;
+          return acc;
+        }, {});
+
+        objectiveList.innerHTML = '';
+        state.objectives.forEach(obj => {
+          const parent = obj.parentId ? objectiveLookup[obj.parentId] : null;
+          const krList = state.keyResults[obj.id] || [];
+          const latestCheckIn = getLatestCheckInForObjective_(obj.id);
+          const badgeClass = latestCheckIn ? confidenceClass_(latestCheckIn.confidence) : 'warn';
+          const latestBadge = latestCheckIn
+            ? `<span class="badge ${badgeClass}">${latestCheckIn.weekStart} · ${latestCheckIn.confidence}</span>`
+            : `<span class="badge warn">No check-in yet</span>`;
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.id = `objective-${obj.id}`;
+          card.innerHTML = `
+            <h3>${obj.title}</h3>
+            <p>${obj.description || 'No context provided yet.'}</p>
+            <p class="hint"><strong>Why now:</strong> ${obj.rationale || 'Not provided yet.'}</p>
+            <div class="meta">
+              <span class="tag">${obj.level}</span>
+              <span class="tag">${obj.quarter}</span>
+              ${parent ? `<span class="tag">Maps to: ${parent.title}</span>` : ''}
+              <span class="tag">Priority ${obj.priority || '—'}</span>
+              <span class="tag">Impact ${obj.impact || '—'}</span>
+              <span class="tag">${obj.progress || 0}%</span>
+              ${latestBadge}
+              <a class="tag" href="#objective-detail-${obj.id}" target="_self">View KRs</a>
+            </div>
+            <div class="warning" id="kr-warning-${obj.id}" style="display: ${krList.length > (state.appSettings ? state.appSettings.krSoftCap : 5) ? 'block' : 'none'};">This objective has more than ${state.appSettings ? state.appSettings.krSoftCap : 5} key results. Consider trimming for focus.</div>
+            <div class="kr-list" id="kr-${obj.id}">
+              <div class="kr-item">Key Results loading...</div>
+            </div>
+          `;
+          objectiveList.appendChild(card);
+          loadKeyResults(obj.id);
+        });
+        renderDashboard();
+      }
+
+      function loadKeyResults(objectiveId) {
+        google.script.run.withSuccessHandler(results => {
+          state.keyResults[objectiveId] = results;
+          const container = document.getElementById(`kr-${objectiveId}`);
+          const warning = document.getElementById(`kr-warning-${objectiveId}`);
+          if (!container) return;
+          if (!results.length) {
+            container.innerHTML = '<div class="kr-item">No key results yet.</div>';
+            if (warning) warning.style.display = 'none';
+            return;
+          }
+          const krCap = state.appSettings ? state.appSettings.krSoftCap : 5;
+          if (warning) warning.style.display = results.length > krCap ? 'block' : 'none';
+          container.innerHTML = results.map(kr => `
+            <div class="kr-item">
+              <div class="kr-meta">
+                <span>${kr.title}</span>
+                <span class="hint">${kr.metric}: ${kr.baseline || 0} → ${kr.target || 0} by ${kr.timeline || 'end of quarter'}</span>
+              </div>
+              <span class="status">${kr.current || 0}/${kr.target || 0} (${kr.confidence || 'No status'})</span>
+            </div>
+          `).join('');
+          renderDashboard();
+        }).listKeyResults(objectiveId);
+      }
+
+      function renderDashboard() {
+        const dashboard = document.getElementById('dashboardSummary');
+        if (!dashboard) return;
+        const summary = computeSummary();
+        if (!summary) {
+          dashboard.innerHTML = '<p class="loading">Loading summary...</p>';
+          return;
+        }
+        dashboard.innerHTML = `
+          <div class="summary-card">
+            <h3>Total objectives</h3>
+            <div class="value">${summary.totalObjectives}</div>
+            <div class="detail">Exec ${summary.execCount} · Dept ${summary.deptCount} · Team ${summary.teamCount}</div>
+          </div>
+          <div class="summary-card">
+            <h3>Alignment coverage</h3>
+            <div class="value">${summary.alignmentRate}%</div>
+            <div class="detail">Dept ${summary.deptAlignment}% · Team ${summary.teamAlignment}%</div>
+          </div>
+          <div class="summary-card">
+            <h3>KR coverage</h3>
+            <div class="value">${summary.krCoverage}%</div>
+            <div class="detail">${summary.objectivesWithKrs} of ${summary.totalObjectives} objectives</div>
+          </div>
+          <div class="summary-card">
+            <h3>KR focus</h3>
+            <div class="value">${summary.avgKrsPerObjective}</div>
+            <div class="detail">${summary.objectivesOverCap} objectives over ${summary.krSoftCap} KRs</div>
+          </div>
+          <div class="summary-card">
+            <h3>Weekly check-ins</h3>
+            <div class="value">${summary.checkInRate}%</div>
+            <div class="detail">${summary.krsCheckedIn} of ${summary.totalKrs} KRs updated</div>
+          </div>
+        `;
+        renderTrend();
+        renderConfidenceTrend();
+        renderRollups();
+        renderAlignmentMap();
+      }
+
+      function renderTrend() {
+        const container = document.getElementById('trendSummary');
+        if (!container) return;
+        const trend = computeTrend(6);
+        if (!trend.length) {
+          container.innerHTML = '<p class="loading">No check-in history yet.</p>';
+          return;
+        }
+        container.innerHTML = `
+          <div class="trend-bars">
+            ${trend.map(item => `
+              <div class="trend-bar">
+                <div class="bar"><div class="fill" style="height: ${item.rate}%;"></div></div>
+                <div class="value">${item.rate}%</div>
+                <div class="detail">${item.label}</div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      function renderConfidenceTrend() {
+        const container = document.getElementById('confidenceTrend');
+        if (!container) return;
+        const trend = computeConfidenceTrend(6);
+        if (!trend.length) {
+          container.innerHTML = '<p class="loading">No confidence history yet.</p>';
+          return;
+        }
+        container.innerHTML = `
+          <div class="trend-bars">
+            ${trend.map(item => `
+              <div class="trend-bar">
+                <div class="stack-bar">
+                  <div class="stack-segment stack-on" style="height: ${item.on}%"></div>
+                  <div class="stack-segment stack-risk" style="height: ${item.risk}%"></div>
+                  <div class="stack-segment stack-off" style="height: ${item.off}%"></div>
+                </div>
+                <div class="detail">${item.label}</div>
+                <div class="hint">On ${item.on}% · Risk ${item.risk}% · Off ${item.off}%</div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      function renderRollups() {
+        renderRollupList('departmentRollups', buildRollups('department'));
+        renderRollupList('teamRollups', buildRollups('team'));
+      }
+
+      function renderRollupList(containerId, rollups) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        if (!rollups.length) {
+          container.innerHTML = '<p class="loading">No data yet.</p>';
+          return;
+        }
+        container.innerHTML = rollups.map(item => `
+          <details class="rollup">
+            <summary>
+              <span>${item.name}</span>
+              <span class="rollup-meta">${item.objectiveCount} objectives · ${item.alignmentRate}% aligned · ${item.krCoverage}% KR coverage · ${item.checkInRate}% check-ins</span>
+            </summary>
+            <div class="rollup-list">
+              ${item.objectives.map(obj => `
+                <details class="objective-detail" id="objective-detail-${obj.id}">
+                  <summary>
+                    <span>${obj.title}</span>
+                    <span class="objective-meta">${obj.level} · Priority ${obj.priority || '—'} · Impact ${obj.impact || '—'}</span>
+                  </summary>
+                  <div class="objective-krs">
+                    ${renderObjectiveKrs_(obj.id)}
+                  </div>
+                </details>
+              `).join('')}
+            </div>
+          </details>
+        `).join('');
+      }
+
+      function computeSummary() {
+        if (!state.objectives) return null;
+        const objectives = state.objectives || [];
+        const krs = state.keyResultsAll || [];
+        const checkIns = state.checkIns || [];
+        const krSoftCap = state.appSettings ? state.appSettings.krSoftCap : 5;
+        const execCount = objectives.filter(obj => obj.level === 'Executive').length;
+        const deptObjectives = objectives.filter(obj => obj.level === 'Department');
+        const teamObjectives = objectives.filter(obj => obj.level === 'Team');
+        const deptCount = deptObjectives.length;
+        const teamCount = teamObjectives.length;
+        const deptAligned = deptObjectives.filter(obj => obj.parentId).length;
+        const teamAligned = teamObjectives.filter(obj => obj.parentId).length;
+
+        const krCounts = objectives.reduce((acc, obj) => {
+          acc[obj.id] = 0;
+          return acc;
+        }, {});
+        krs.forEach(kr => {
+          if (krCounts[kr.objectiveId] !== undefined) {
+            krCounts[kr.objectiveId] += 1;
+          }
+        });
+        const objectivesWithKrs = Object.values(krCounts).filter(count => count > 0).length;
+        const objectivesOverCap = Object.values(krCounts).filter(count => count > krSoftCap).length;
+        const avgKrsPerObjective = objectives.length ? (krs.length / objectives.length) : 0;
+
+        const weekStart = getWeekStartString_(new Date());
+        const checkInsThisWeek = checkIns.filter(item => item.weekStart === weekStart);
+        const krCheckedInSet = checkInsThisWeek.reduce((acc, item) => {
+          acc[item.keyResultId] = true;
+          return acc;
+        }, {});
+        const krsCheckedIn = Object.keys(krCheckedInSet).length;
+
+        return {
+          totalObjectives: objectives.length,
+          execCount,
+          deptCount,
+          teamCount,
+          krSoftCap,
+          alignmentRate: percent_(deptAligned + teamAligned, deptCount + teamCount),
+          deptAlignment: percent_(deptAligned, deptCount),
+          teamAlignment: percent_(teamAligned, teamCount),
+          objectivesWithKrs,
+          krCoverage: percent_(objectivesWithKrs, objectives.length),
+          objectivesOverCap,
+          avgKrsPerObjective: avgKrsPerObjective.toFixed(1),
+          krsCheckedIn,
+          totalKrs: krs.length,
+          checkInRate: percent_(krsCheckedIn, krs.length)
+        };
+      }
+
+      function computeConfidenceTrend(weeks) {
+        const krs = state.keyResultsAll || [];
+        if (!krs.length) return [];
+        const checkIns = state.checkIns || [];
+        const weekStarts = getRecentWeekStarts_(weeks);
+        return weekStarts.map(weekStart => {
+          const latestByKr = getLatestCheckInsByWeek_(checkIns, weekStart);
+          const values = Object.values(latestByKr);
+          const total = values.length || 0;
+          const on = values.filter(item => item.confidence === 'On track').length;
+          const risk = values.filter(item => item.confidence === 'At risk').length;
+          const off = values.filter(item => item.confidence === 'Off track').length;
+          return {
+            weekStart,
+            label: formatWeekLabel_(weekStart),
+            on: percent_(on, total),
+            risk: percent_(risk, total),
+            off: percent_(off, total)
+          };
+        });
+      }
+
+      function computeTrend(weeks) {
+        const krs = state.keyResultsAll || [];
+        if (!krs.length) return [];
+        const checkIns = state.checkIns || [];
+        const weekStarts = getRecentWeekStarts_(weeks);
+        return weekStarts.map(weekStart => {
+          const checkInsThisWeek = checkIns.filter(item => item.weekStart === weekStart);
+          const krCheckedInSet = checkInsThisWeek.reduce((acc, item) => {
+            acc[item.keyResultId] = true;
+            return acc;
+          }, {});
+          const krsCheckedIn = Object.keys(krCheckedInSet).length;
+          return {
+            weekStart,
+            rate: percent_(krsCheckedIn, krs.length),
+            label: formatWeekLabel_(weekStart)
+          };
+        });
+      }
+
+      function buildRollups(groupKey) {
+        const objectives = filterObjectives_(state.objectives || []);
+        const krs = state.keyResultsAll || [];
+        const checkIns = state.checkIns || [];
+        const groups = {};
+
+        objectives.forEach(obj => {
+          const name = obj[groupKey] || 'Unassigned';
+          if (!groups[name]) {
+            groups[name] = { name, objectives: [], objectiveIds: new Set() };
+          }
+          groups[name].objectives.push(obj);
+          groups[name].objectiveIds.add(obj.id);
+        });
+
+        const weekStart = getWeekStartString_(new Date());
+        const checkInsThisWeek = checkIns.filter(item => item.weekStart === weekStart);
+
+        return Object.values(groups).map(group => {
+          const objectiveIds = Array.from(group.objectiveIds);
+          const groupKrs = krs.filter(kr => objectiveIds.indexOf(kr.objectiveId) !== -1);
+          const krCounts = objectiveIds.reduce((acc, id) => {
+            acc[id] = 0;
+            return acc;
+          }, {});
+          groupKrs.forEach(kr => {
+            if (krCounts[kr.objectiveId] !== undefined) {
+              krCounts[kr.objectiveId] += 1;
+            }
+          });
+          const objectivesWithKrs = Object.values(krCounts).filter(count => count > 0).length;
+          const alignedObjectives = group.objectives.filter(obj => obj.parentId && obj.level !== 'Executive').length;
+          const alignEligible = group.objectives.filter(obj => obj.level !== 'Executive').length;
+          const krCheckedInSet = checkInsThisWeek.reduce((acc, item) => {
+            if (groupKrs.some(kr => kr.id === item.keyResultId)) {
+              acc[item.keyResultId] = true;
+            }
+            return acc;
+          }, {});
+          const krsCheckedIn = Object.keys(krCheckedInSet).length;
+
+          return {
+            name: group.name,
+            objectives: group.objectives,
+            objectiveCount: group.objectives.length,
+            alignmentRate: percent_(alignedObjectives, alignEligible),
+            krCoverage: percent_(objectivesWithKrs, group.objectives.length),
+            checkInRate: percent_(krsCheckedIn, groupKrs.length)
+          };
+        }).sort((a, b) => b.objectiveCount - a.objectiveCount);
+      }
+
+      function percent_(value, total) {
+        if (!total) return 0;
+        return Math.round((value / total) * 100);
+      }
+
+      function getWeekStartString_(date) {
+        const now = new Date(date);
+        const day = now.getDay();
+        const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+        const monday = new Date(now);
+        monday.setDate(diff);
+        return monday.toISOString().slice(0, 10);
+      }
+
+      function getRecentWeekStarts_(weeks) {
+        const weekStarts = [];
+        const now = new Date();
+        for (let i = weeks - 1; i >= 0; i -= 1) {
+          const date = new Date(now);
+          date.setDate(date.getDate() - i * 7);
+          weekStarts.push(getWeekStartString_(date));
+        }
+        return weekStarts;
+      }
+
+      function getLatestCheckInsByWeek_(checkIns, weekStart) {
+        return checkIns.reduce((acc, item) => {
+          if (item.weekStart !== weekStart) return acc;
+          if (!acc[item.keyResultId]) {
+            acc[item.keyResultId] = item;
+            return acc;
+          }
+          const existing = acc[item.keyResultId];
+          if ((item.createdAt || '') > (existing.createdAt || '')) {
+            acc[item.keyResultId] = item;
+          }
+          return acc;
+        }, {});
+      }
+
+      function formatWeekLabel_(weekStart) {
+        const date = new Date(weekStart + 'T00:00:00');
+        const month = date.toLocaleString('en-US', { month: 'short' });
+        return `${month} ${date.getDate()}`;
+      }
+
+      function renderObjectiveKrs_(objectiveId) {
+        const krs = (state.keyResultsAll || []).filter(kr => kr.objectiveId === objectiveId);
+        if (!krs.length) {
+          return '<div class="objective-kr">No key results yet.</div>';
+        }
+        return krs.map(kr => {
+          const latestCheckIn = getLatestCheckInForKr_(kr.id);
+          const badgeClass = latestCheckIn ? confidenceClass_(latestCheckIn.confidence) : 'warn';
+          const badge = latestCheckIn
+            ? `<span class="badge kr-badge ${badgeClass}">${latestCheckIn.weekStart} · ${latestCheckIn.confidence}</span>`
+            : `<span class="badge kr-badge warn">No check-in yet</span>`;
+          const checkInText = latestCheckIn
+            ? `Latest check-in ${latestCheckIn.weekStart} · ${latestCheckIn.current} · ${latestCheckIn.confidence}`
+            : 'No check-ins yet';
+          return `
+            <div class="objective-kr">
+              <div><strong>${kr.title}</strong> · ${kr.metric}: ${kr.baseline || 0} → ${kr.target || 0} by ${kr.timeline || 'quarter end'} ${badge}</div>
+              <div>${checkInText}</div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      function getLatestCheckInForKr_(krId) {
+        const checkIns = state.checkIns || [];
+        return checkIns.reduce((latest, item) => {
+          if (item.keyResultId !== krId) return latest;
+          if (!latest) return item;
+          return (item.createdAt || '') > (latest.createdAt || '') ? item : latest;
+        }, null);
+      }
+
+      function getLatestCheckInForObjective_(objectiveId) {
+        const krs = (state.keyResultsAll || []).filter(kr => kr.objectiveId === objectiveId);
+        return krs.reduce((latest, kr) => {
+          const checkIn = getLatestCheckInForKr_(kr.id);
+          if (!checkIn) return latest;
+          if (!latest) return checkIn;
+          return (checkIn.createdAt || '') > (latest.createdAt || '') ? checkIn : latest;
+        }, null);
+      }
+
+      function confidenceClass_(confidence) {
+        if (confidence === 'On track') return 'on-track';
+        if (confidence === 'At risk') return 'at-risk';
+        if (confidence === 'Off track') return 'off-track';
+        return 'warn';
+      }
+
+      function filterObjectives_(objectives) {
+        const quarter = rollupQuarterSelect ? rollupQuarterSelect.value : '';
+        const level = rollupLevelSelect ? rollupLevelSelect.value : '';
+        return objectives.filter(obj => {
+          if (quarter && obj.quarter !== quarter) return false;
+          if (level && obj.level !== level) return false;
+          return true;
+        });
+      }
+
+      function renderAlignmentMap() {
+        if (!alignmentMap) return;
+        const objectives = filterObjectives_(state.objectives || []);
+        const execs = objectives.filter(obj => obj.level === 'Executive');
+        const depts = objectives.filter(obj => obj.level === 'Department');
+        const teams = objectives.filter(obj => obj.level === 'Team');
+        if (!execs.length) {
+          alignmentMap.innerHTML = '<p class="loading">No executive objectives yet.</p>';
+          return;
+        }
+        alignmentMap.innerHTML = execs.map(exec => {
+          const deptChildren = depts.filter(obj => obj.parentId === exec.id);
+          const deptMarkup = deptChildren.map(dept => {
+            const teamChildren = teams.filter(obj => obj.parentId === dept.id);
+            return `
+              <div class="map-item">
+                <div><strong>${dept.title}</strong> <span class="hint">(${dept.department || 'Department'})</span></div>
+                <div class="map-branch">
+                  ${teamChildren.length ? teamChildren.map(team => `
+                    <div>${team.title} <span class="hint">(${team.team || 'Team'})</span></div>
+                  `).join('') : '<div>No team objectives yet.</div>'}
+                </div>
+              </div>
+            `;
+          }).join('');
+          return `
+            <div class="map-item">
+              <div><strong>${exec.title}</strong> <span class="hint">(Executive)</span></div>
+              <div class="map-branch">
+                ${deptChildren.length ? deptMarkup : '<div>No department objectives yet.</div>'}
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      function renderCoachStatus() {
+        if (!state.bootstrap || !state.bootstrap.aiConfig) return;
+        const config = state.bootstrap.aiConfig;
+        const provider = coachProviderSelect ? coachProviderSelect.value : 'openai';
+        const hasKey = provider === 'openai' ? config.hasOpenAiKey : config.hasAnthropicKey;
+        const model = provider === 'openai' ? config.openaiModel : config.anthropicModel;
+        if (coachModelInput && !coachModelInput.value) {
+          coachModelInput.value = model;
+        }
+        if (coachKeyHint) {
+          coachKeyHint.textContent = hasKey
+            ? `${provider} key detected.`
+            : `No ${provider} key saved yet. Add one in AI settings.`;
+        }
+      }
+
+      function renderAiSettingsVisibility() {
+        if (!aiSettingsForm || !state.bootstrap) return;
+        if (!state.bootstrap.canManageAiSettings) {
+          aiSettingsForm.style.display = 'none';
+          if (coachKeyHint) {
+            coachKeyHint.textContent = 'AI settings are restricted to Exec/Operations.';
+          }
+          return;
+        }
+        aiSettingsForm.style.display = 'grid';
+      }
+
+      function renderAdminVisibility() {
+        if (!adminPanel || !state.bootstrap) return;
+        adminPanel.style.display = state.bootstrap.canManageAdmin ? 'block' : 'none';
+      }
+
+      function setupAdminUserForm() {
+        const form = document.getElementById('userAdminForm');
+        if (!form) return;
+        if (adminUserSelect) {
+          adminUserSelect.addEventListener('change', () => {
+            const user = state.users.find(item => item.email === adminUserSelect.value);
+            if (!user) return;
+            adminUserName.value = user.name || '';
+            adminUserRole.value = user.role || 'member';
+            adminUserDepartment.value = user.department || '';
+            adminUserTeam.value = user.team || '';
+          });
+        }
+        form.addEventListener('submit', event => {
+          event.preventDefault();
+          const formData = new FormData(form);
+          const payload = Object.fromEntries(formData.entries());
+          if (adminUserEmail && adminUserEmail.value) {
+            payload.email = adminUserEmail.value.trim();
+          }
+          if (!payload.email) {
+            alert('Select a user or enter an email.');
+            return;
+          }
+          google.script.run.withSuccessHandler(() => {
+            loadUsers();
+            if (adminUserEmail) adminUserEmail.value = '';
+            alert('User updated.');
+          }).withFailureHandler(error => {
+            alert(`User update failed: ${error.message || error}`);
+          }).updateUser(payload);
+        });
+
+        if (deleteUserButton) {
+          deleteUserButton.addEventListener('click', () => {
+            const email = adminUserEmail && adminUserEmail.value ? adminUserEmail.value.trim() : adminUserSelect.value;
+            if (!email) {
+              alert('Select a user or enter an email.');
+              return;
+            }
+            if (!confirm(`Delete user ${email}?`)) return;
+            google.script.run.withSuccessHandler(() => {
+              loadUsers();
+              alert('User deleted.');
+            }).withFailureHandler(error => {
+              alert(`User delete failed: ${error.message || error}`);
+            }).deleteUser(email);
+          });
+        }
+      }
+
+      function setupOrgAdminForm() {
+        if (saveDepartmentButton) {
+          saveDepartmentButton.addEventListener('click', () => {
+            const payload = {
+              name: document.getElementById('adminDepartmentName').value,
+              leadEmail: document.getElementById('adminDepartmentLead').value
+            };
+            google.script.run.withSuccessHandler(() => {
+              alert('Department saved.');
+              loadOrgData();
+            }).withFailureHandler(error => {
+              alert(`Department save failed: ${error.message || error}`);
+            }).upsertDepartment(payload);
+          });
+        }
+        if (deleteDepartmentButton) {
+          deleteDepartmentButton.addEventListener('click', () => {
+            const name = document.getElementById('adminDepartmentName').value;
+            if (!name) {
+              alert('Enter a department name to delete.');
+              return;
+            }
+            if (!confirm(`Delete department ${name}?`)) return;
+            google.script.run.withSuccessHandler(() => {
+              alert('Department deleted.');
+              loadOrgData();
+            }).withFailureHandler(error => {
+              alert(`Department delete failed: ${error.message || error}`);
+            }).deleteDepartment(name);
+          });
+        }
+        if (saveTeamButton) {
+          saveTeamButton.addEventListener('click', () => {
+            const payload = {
+              name: document.getElementById('adminTeamName').value,
+              department: document.getElementById('adminTeamDepartment').value,
+              leadEmail: document.getElementById('adminTeamLead').value
+            };
+            google.script.run.withSuccessHandler(() => {
+              alert('Team saved.');
+              loadOrgData();
+            }).withFailureHandler(error => {
+              alert(`Team save failed: ${error.message || error}`);
+            }).upsertTeam(payload);
+          });
+        }
+        if (deleteTeamButton) {
+          deleteTeamButton.addEventListener('click', () => {
+            const name = document.getElementById('adminTeamName').value;
+            if (!name) {
+              alert('Enter a team name to delete.');
+              return;
+            }
+            if (!confirm(`Delete team ${name}?`)) return;
+            google.script.run.withSuccessHandler(() => {
+              alert('Team deleted.');
+              loadOrgData();
+            }).withFailureHandler(error => {
+              alert(`Team delete failed: ${error.message || error}`);
+            }).deleteTeam(name);
+          });
+        }
+      }
+
+      function setupQuarterAdminForm() {
+        const form = document.getElementById('quarterAdminForm');
+        if (!form) return;
+        form.addEventListener('submit', event => {
+          event.preventDefault();
+          const formData = new FormData(form);
+          const payload = Object.fromEntries(formData.entries());
+          google.script.run.withSuccessHandler(() => {
+            alert('Quarter saved.');
+            loadOrgData();
+          }).withFailureHandler(error => {
+            alert(`Quarter save failed: ${error.message || error}`);
+          }).upsertQuarter(payload);
+        });
+        if (deleteQuarterButton) {
+          deleteQuarterButton.addEventListener('click', () => {
+            const name = document.getElementById('adminQuarterName').value;
+            if (!name) {
+              alert('Enter a quarter name to delete.');
+              return;
+            }
+            if (!confirm(`Delete quarter ${name}?`)) return;
+            google.script.run.withSuccessHandler(() => {
+              alert('Quarter deleted.');
+              loadOrgData();
+            }).withFailureHandler(error => {
+              alert(`Quarter delete failed: ${error.message || error}`);
+            }).deleteQuarter(name);
+          });
+        }
+      }
+
+      function setupSettingsAdminForm() {
+        const form = document.getElementById('settingsAdminForm');
+        if (!form) return;
+        form.addEventListener('submit', event => {
+          event.preventDefault();
+          const formData = new FormData(form);
+          const payload = Object.fromEntries(formData.entries());
+          google.script.run.withSuccessHandler(settings => {
+            state.appSettings = settings;
+            renderDashboard();
+            renderObjectives();
+            alert('Settings saved.');
+          }).withFailureHandler(error => {
+            alert(`Settings update failed: ${error.message || error}`);
+          }).updateAppSettings(payload);
+        });
+      }
+
+      function loadUsers() {
+        if (!state.bootstrap || !state.bootstrap.canManageAdmin) return;
+        google.script.run.withSuccessHandler(users => {
+          state.users = users || [];
+          setUserOptions(adminUserSelect, state.users);
+          if (state.users.length && adminUserSelect) {
+            adminUserSelect.value = state.users[0].email;
+            adminUserSelect.dispatchEvent(new Event('change'));
+          }
+        }).listUsers();
+      }
+
+      function loadOrgData() {
+        google.script.run.withSuccessHandler(departments => {
+          state.departments = departments || [];
+          hydrateFilters();
+        }).listDepartments();
+        google.script.run.withSuccessHandler(teams => {
+          state.teams = teams || [];
+          hydrateFilters();
+        }).listTeams();
+        google.script.run.withSuccessHandler(quarters => {
+          state.quarters = quarters || [];
+          hydrateFilters();
+        }).listQuarters();
+      }
+
+      function setupCoachForm() {
+        const form = document.getElementById('coachForm');
+        if (!form) return;
+        form.addEventListener('submit', event => {
+          event.preventDefault();
+          const formData = new FormData(form);
+          const payload = Object.fromEntries(formData.entries());
+          if (!payload.objectiveId) {
+            alert('Select an objective to coach.');
+            return;
+          }
+          coachOutput.innerHTML = '<p class="loading">Generating coaching...</p>';
+          google.script.run.withSuccessHandler(result => {
+            if (!result.ok) {
+              coachOutput.innerHTML = `<p class="warning">Error: ${result.error}</p>`;
+              return;
+            }
+            renderCoachOutput(result.text);
+          }).withFailureHandler(error => {
+            coachOutput.innerHTML = `<p class="warning">Request failed: ${error.message || error}</p>`;
+          }).coachObjective(payload);
+        });
+      }
+
+      function renderCoachOutput(text) {
+        if (!coachOutput) return;
+        let data = null;
+        try {
+          data = JSON.parse(text);
+        } catch (error) {
+          coachOutput.innerHTML = `<p>${text}</p>`;
+          return;
+        }
+        coachOutput.innerHTML = `
+          <div>
+            <h3>Summary</h3>
+            <p>${data.summary || ''}</p>
+          </div>
+          <div>
+            <h3>Clarity gaps</h3>
+            ${renderList_(data.clarity_gaps)}
+          </div>
+          <div>
+            <h3>Alignment</h3>
+            <p>${data.alignment || ''}</p>
+          </div>
+          <div>
+            <h3>Prioritization</h3>
+            <p>${data.prioritization || ''}</p>
+          </div>
+          <div>
+            <h3>Risks</h3>
+            ${renderList_(data.risks)}
+          </div>
+          <div>
+            <h3>Suggestions</h3>
+            ${renderList_(data.suggestions)}
+          </div>
+          <div>
+            <h3>Rewritten objective</h3>
+            <p>${data.rewritten_objective || ''}</p>
+          </div>
+          <div>
+            <h3>KR rewrites</h3>
+            ${renderKrList_(data.kr_rewrites)}
+          </div>
+        `;
+      }
+
+      function renderList_(items) {
+        if (!items || !items.length) return '<p class="hint">No items.</p>';
+        return `<ul>${items.map(item => `<li>${item}</li>`).join('')}</ul>`;
+      }
+
+      function renderKrList_(items) {
+        if (!items || !items.length) return '<p class="hint">No KR suggestions.</p>';
+        return `<ul>${items.map(item => {
+          const metric = item.metric || '';
+          const baseline = item.baseline !== undefined ? item.baseline : '';
+          const target = item.target !== undefined ? item.target : '';
+          const timeline = item.timeline || '';
+          return `<li>${item.title || ''} — ${metric} (${baseline} → ${target} by ${timeline})</li>`;
+        }).join('')}</ul>`;
+      }
+
+      function setupAiSettingsForm() {
+        const form = document.getElementById('aiSettingsForm');
+        if (!form) return;
+        form.addEventListener('submit', event => {
+          event.preventDefault();
+          const formData = new FormData(form);
+          const payload = Object.fromEntries(formData.entries());
+          google.script.run.withSuccessHandler(config => {
+            state.bootstrap.aiConfig = config;
+            form.reset();
+            renderCoachStatus();
+          }).setApiKeys(payload);
+        });
+      }
+
+      function loadObjectives() {
+        const filters = {
+          level: document.getElementById('level').value,
+          quarter: quarterSelect.value,
+          department: departmentSelect.value,
+          team: teamSelect.value
+        };
+        objectiveList.innerHTML = '<p class="loading">Loading objectives...</p>';
+        google.script.run.withSuccessHandler(results => {
+          state.objectives = results;
+          renderObjectives();
+        }).listObjectives(filters);
+      }
+
+      function hydrateFilters() {
+        const quarters = state.quarters.map(q => q.name);
+        const departments = state.departments.map(d => d.name);
+        const teams = state.teams.map(t => t.name);
+
+        setSelectOptions(quarterSelect, quarters);
+        setSelectOptions(quarterFormSelect, quarters, false);
+        setSelectOptions(departmentSelect, departments);
+        setSelectOptions(teamSelect, teams);
+        setSelectOptions(rollupQuarterSelect, quarters);
+
+        if (quarters.length) {
+          quarterFormSelect.value = quarters[0];
+        }
+
+        updateParentOptions();
+        setObjectiveOptions(krObjectiveSelect, state.objectives, true);
+        setKeyResultOptions(checkInKrSelect, state.keyResultsAll);
+        setObjectiveOptions(coachObjectiveSelect, state.objectives, true);
+        renderCoachStatus();
+        renderAiSettingsVisibility();
+        renderAdminVisibility();
+
+        if (state.appSettings) {
+          const settingKrCap = document.getElementById('settingKrCap');
+          const settingExecCap = document.getElementById('settingExecCap');
+          const settingTeamCap = document.getElementById('settingTeamCap');
+          if (settingKrCap) settingKrCap.value = state.appSettings.krSoftCap;
+          if (settingExecCap) settingExecCap.value = state.appSettings.execObjectiveSoftCap;
+          if (settingTeamCap) settingTeamCap.value = state.appSettings.teamObjectiveSoftCap;
+        }
+
+        const config = state.bootstrap.aiConfig;
+        if (config) {
+          const openaiModel = document.getElementById('openaiModel');
+          const anthropicModel = document.getElementById('anthropicModel');
+          if (openaiModel && !openaiModel.value) openaiModel.value = config.openaiModel;
+          if (anthropicModel && !anthropicModel.value) anthropicModel.value = config.anthropicModel;
+        }
+      }
+
+      function setupForm() {
+        const form = document.getElementById('objectiveForm');
+        form.addEventListener('submit', event => {
+          event.preventDefault();
+          const formData = new FormData(form);
+          const payload = Object.fromEntries(formData.entries());
+          payload.status = 'active';
+          payload.ownerEmail = state.bootstrap.user.email;
+          payload.ownerName = state.bootstrap.user.name;
+          google.script.run.withSuccessHandler(() => {
+            form.reset();
+            updateParentOptions();
+            refreshAllData();
+          }).createObjective(payload);
+        });
+      }
+
+      function setupKeyResultForm() {
+        const form = document.getElementById('krForm');
+        form.addEventListener('submit', event => {
+          event.preventDefault();
+          const formData = new FormData(form);
+          const payload = Object.fromEntries(formData.entries());
+          payload.status = 'active';
+          payload.ownerEmail = state.bootstrap.user.email;
+          google.script.run.withSuccessHandler(() => {
+            form.reset();
+            refreshAllData();
+          }).createKeyResult(payload);
+        });
+      }
+
+      function setupCheckInForm() {
+        const form = document.getElementById('checkInForm');
+        form.addEventListener('submit', event => {
+          event.preventDefault();
+          const formData = new FormData(form);
+          const payload = Object.fromEntries(formData.entries());
+          payload.ownerEmail = state.bootstrap.user.email;
+          const selectedKr = state.keyResultsAll.find(kr => kr.id === payload.keyResultId);
+          payload.objectiveId = selectedKr ? selectedKr.objectiveId : '';
+          google.script.run.withSuccessHandler(() => {
+            form.reset();
+            refreshAllData();
+          }).createCheckIn(payload);
+        });
+      }
+
+      function setDefaultWeekStart() {
+        const input = document.getElementById('checkInWeek');
+        if (!input) return;
+        input.value = getWeekStartString_(new Date());
+      }
+
+      function refreshAllData() {
+        google.script.run.withSuccessHandler(results => {
+          state.objectives = results;
+          renderObjectives();
+          updateParentOptions();
+          setObjectiveOptions(krObjectiveSelect, state.objectives, true);
+          setObjectiveOptions(coachObjectiveSelect, state.objectives, true);
+          loadKeyResultsAll();
+          loadCheckInsAll();
+        }).listObjectives();
+      }
+
+      function loadKeyResultsAll() {
+        google.script.run.withSuccessHandler(results => {
+          state.keyResultsAll = results;
+          setKeyResultOptions(checkInKrSelect, state.keyResultsAll);
+          state.objectives.forEach(obj => loadKeyResults(obj.id));
+          renderDashboard();
+        }).listKeyResults();
+      }
+
+      function loadCheckInsAll() {
+        google.script.run.withSuccessHandler(results => {
+          state.checkIns = results;
+          renderDashboard();
+          renderAlignmentMap();
+        }).listCheckIns();
+      }
+
+      function showLoadError(message) {
+        const details = message ? ` ${message}` : '';
+        if (objectiveList) {
+          objectiveList.innerHTML = `<p class="loading">Failed to load OKR data.${details}</p>`;
+        }
+      }
+
+      function getBootstrapUrl() {
+        const url = new URL(window.location.href);
+        url.searchParams.set('mode', 'bootstrap');
+        url.searchParams.set('ts', Date.now().toString());
+        return url.toString();
+      }
+
+      function applyBootstrapData(data) {
+        state.bootstrap = data;
+        state.objectives = data.objectives || [];
+        state.keyResultsAll = data.keyResults || [];
+        state.checkIns = data.checkIns || [];
+        state.appSettings = data.appSettings || null;
+        state.departments = data.departments || [];
+        state.teams = data.teams || [];
+        state.quarters = data.quarters || [];
+        hydrateFilters();
+        renderObjectives();
+        renderAlignmentMap();
+        setDefaultWeekStart();
+        loadUsers();
+        if (!state.keyResultsAll.length) loadKeyResultsAll();
+        if (!state.checkIns.length) loadCheckInsAll();
+      }
+
+      function bootstrap() {
+        google.script.run.withSuccessHandler(payload => {
+          if (!payload) {
+            showLoadError('No data returned from Apps Script.');
+            return;
+          }
+          let data = payload;
+          if (typeof payload === 'string') {
+            try {
+              data = JSON.parse(payload);
+            } catch (error) {
+              showLoadError('Invalid JSON payload.');
+              return;
+            }
+          }
+          if (data && data.ok === false) {
+            showLoadError(data.error || 'Server error.');
+            return;
+          }
+          if (data && data.data) {
+            applyBootstrapData(data.data);
+          } else {
+            applyBootstrapData(data);
+          }
+        }).withFailureHandler(error => {
+          const message = error && error.message ? error.message : String(error || 'Unknown error.');
+          console.error('Bootstrap failed:', error);
+          fetch(getBootstrapUrl())
+            .then(response => response.json())
+            .then(payload => {
+              if (!payload || payload.ok === false) {
+                showLoadError(payload && payload.error ? payload.error : message);
+                return;
+              }
+              applyBootstrapData(payload.data || payload);
+            })
+            .catch(() => showLoadError(message));
+        }).getBootstrapDataRaw({
+          includeKeyResults: false,
+          includeCheckIns: false
+        });
+      }
+
+      document.getElementById('levelSelect').addEventListener('change', updateParentOptions);
+      document.getElementById('refresh').addEventListener('click', refreshAllData);
+      if (rollupQuarterSelect) rollupQuarterSelect.addEventListener('change', renderRollups);
+      if (rollupLevelSelect) rollupLevelSelect.addEventListener('change', renderRollups);
+      if (rollupQuarterSelect) rollupQuarterSelect.addEventListener('change', renderAlignmentMap);
+      if (rollupLevelSelect) rollupLevelSelect.addEventListener('change', renderAlignmentMap);
+      if (coachProviderSelect) coachProviderSelect.addEventListener('change', renderCoachStatus);
+      if (exportRollupsButton) {
+        exportRollupsButton.addEventListener('click', () => {
+          const filters = {
+            quarter: rollupQuarterSelect ? rollupQuarterSelect.value : '',
+            level: rollupLevelSelect ? rollupLevelSelect.value : ''
+          };
+          exportRollupsButton.disabled = true;
+          exportRollupsButton.textContent = 'Exporting...';
+          google.script.run.withSuccessHandler(result => {
+            exportRollupsButton.disabled = false;
+            exportRollupsButton.textContent = 'Export rollups to Sheet';
+            alert(`Exported to ${result.sheetName}. Open the OKR data sheet to view.`);
+          }).withFailureHandler(() => {
+            exportRollupsButton.disabled = false;
+            exportRollupsButton.textContent = 'Export rollups to Sheet';
+            alert('Export failed. Please try again.');
+          }).exportRollupReport(filters);
+        });
+      }
+      setupForm();
+      setupKeyResultForm();
+      setupCheckInForm();
+      setupCoachForm();
+      setupAiSettingsForm();
+      setupAdminUserForm();
+      setupOrgAdminForm();
+      setupQuarterAdminForm();
+      setupSettingsAdminForm();
+      bootstrap();
+    </script>
+  </body>
+</html>
