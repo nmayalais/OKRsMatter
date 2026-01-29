@@ -8,7 +8,8 @@ const APP_CONFIG = {
     TEAMS: 'Teams',
     QUARTERS: 'Quarters',
     CHECK_INS: 'CheckIns',
-    COACH_LOGS: 'CoachLogs'
+    COACH_LOGS: 'CoachLogs',
+    CLIENT_EVENTS: 'ClientEvents'
   },
   SETTINGS_DEFAULTS: {
     KR_SOFT_CAP: 5,
@@ -491,6 +492,23 @@ function createCheckIn(payload) {
   }
 
   return { checkIn: record };
+}
+
+function logClientEvent(payload) {
+  const sheet = getSheet_(APP_CONFIG.SHEETS.CLIENT_EVENTS, [
+    'id', 'event', 'userEmail', 'meta', 'createdAt'
+  ]);
+  const now = new Date().toISOString();
+  const email = Session.getActiveUser().getEmail();
+  const record = {
+    id: Utilities.getUuid(),
+    event: payload && payload.event ? payload.event : 'unknown',
+    userEmail: payload && payload.userEmail ? payload.userEmail : email,
+    meta: payload && payload.meta ? JSON.stringify(payload.meta) : '',
+    createdAt: now
+  };
+  appendRow_(sheet, ['id', 'event', 'userEmail', 'meta', 'createdAt'], record);
+  return { ok: true };
 }
 
 function setupApp() {

@@ -1949,6 +1949,10 @@
             form.reset();
             updateParentOptions();
             refreshAllData();
+            logClientEvent('objective_created', {
+              level: payload.level,
+              quarter: payload.quarter
+            });
           }).createObjective(payload);
         });
       }
@@ -1964,6 +1968,9 @@
           google.script.run.withSuccessHandler(() => {
             form.reset();
             refreshAllData();
+            logClientEvent('key_result_created', {
+              objectiveId: payload.objectiveId
+            });
           }).createKeyResult(payload);
         });
       }
@@ -1980,6 +1987,10 @@
           google.script.run.withSuccessHandler(() => {
             form.reset();
             refreshAllData();
+            logClientEvent('checkin_created', {
+              keyResultId: payload.keyResultId,
+              objectiveId: payload.objectiveId
+            });
           }).createCheckIn(payload);
         });
       }
@@ -2026,6 +2037,17 @@
         }
       }
 
+      function logClientEvent(event, meta) {
+        try {
+          google.script.run.withFailureHandler(() => {}).logClientEvent({
+            event,
+            meta: meta || {}
+          });
+        } catch (error) {
+          // No-op for logging failures.
+        }
+      }
+
       function getBootstrapUrl() {
         const url = new URL(window.location.href);
         url.searchParams.set('mode', 'bootstrap');
@@ -2052,8 +2074,10 @@
       }
 
       function bootstrap() {
+        const startedAt = performance.now();
         google.script.run.withSuccessHandler(payload => {
           if (!payload) {
+            logClientEvent('bootstrap_failure', { reason: 'empty_payload' });
             showLoadError('No data returned from Apps Script.');
             return;
           }
@@ -2062,11 +2086,13 @@
             try {
               data = JSON.parse(payload);
             } catch (error) {
+              logClientEvent('bootstrap_failure', { reason: 'invalid_json' });
               showLoadError('Invalid JSON payload.');
               return;
             }
           }
           if (data && data.ok === false) {
+            logClientEvent('bootstrap_failure', { reason: data.error || 'server_error' });
             showLoadError(data.error || 'Server error.');
             return;
           }
@@ -2075,6 +2101,12 @@
           } else {
             applyBootstrapData(data);
           }
+          logClientEvent('bootstrap_success', {
+            durationMs: Math.round(performance.now() - startedAt),
+            objectives: state.objectives.length,
+            keyResults: state.keyResultsAll.length,
+            checkIns: state.checkIns.length
+          });
         }).withFailureHandler(error => {
           const message = error && error.message ? error.message : String(error || 'Unknown error.');
           console.error('Bootstrap failed:', error);
@@ -2082,12 +2114,22 @@
             .then(response => response.json())
             .then(payload => {
               if (!payload || payload.ok === false) {
+                logClientEvent('bootstrap_failure', { reason: payload && payload.error ? payload.error : message });
                 showLoadError(payload && payload.error ? payload.error : message);
                 return;
               }
               applyBootstrapData(payload.data || payload);
+              logClientEvent('bootstrap_success', {
+                durationMs: Math.round(performance.now() - startedAt),
+                objectives: state.objectives.length,
+                keyResults: state.keyResultsAll.length,
+                checkIns: state.checkIns.length
+              });
             })
-            .catch(() => showLoadError(message));
+            .catch(() => {
+              logClientEvent('bootstrap_failure', { reason: message });
+              showLoadError(message);
+            });
         }).getBootstrapDataRaw({
           includeKeyResults: false,
           includeCheckIns: false
