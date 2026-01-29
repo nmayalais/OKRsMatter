@@ -557,11 +557,11 @@
             </div>
             <div>
               <label for="description">Objective description</label>
-              <textarea id="description" name="description" placeholder="Describe the outcome and scope." required></textarea>
+              <textarea id="description" name="description" placeholder="Describe the outcome and scope."></textarea>
             </div>
             <div>
               <label for="rationale">Why now?</label>
-              <textarea id="rationale" name="rationale" placeholder="Explain the strategic reason this quarter." required></textarea>
+              <textarea id="rationale" name="rationale" placeholder="Explain the strategic reason this quarter."></textarea>
             </div>
             <div class="form-row">
               <div>
@@ -605,6 +605,12 @@
                 <label for="teamInput">Team</label>
                 <input id="teamInput" name="team" placeholder="e.g. Platform">
               </div>
+            </div>
+            <div class="form-row">
+              <label class="checkbox">
+                <input id="objectiveDraft" type="checkbox">
+                Save as draft (skip description & rationale for now)
+              </label>
             </div>
             <button class="btn" type="submit">Add objective</button>
           </form>
@@ -872,42 +878,48 @@
             <label for="krTitle">Key result</label>
             <input id="krTitle" name="title" placeholder="e.g. Increase enterprise conversion rate" required>
           </div>
-          <div class="form-row">
-            <div>
-              <label for="krMetric">Metric</label>
-              <input id="krMetric" name="metric" placeholder="e.g. conversion rate" required>
+            <div class="form-row">
+              <div>
+                <label for="krMetric">Metric</label>
+                <input id="krMetric" name="metric" placeholder="e.g. conversion rate">
+              </div>
+              <div>
+                <label for="krBaseline">Baseline</label>
+                <input id="krBaseline" name="baseline" type="number" step="any">
+              </div>
+              <div>
+                <label for="krTarget">Target</label>
+                <input id="krTarget" name="target" type="number" step="any">
+              </div>
             </div>
-            <div>
-              <label for="krBaseline">Baseline</label>
-              <input id="krBaseline" name="baseline" type="number" step="any" required>
-            </div>
-            <div>
-              <label for="krTarget">Target</label>
-              <input id="krTarget" name="target" type="number" step="any" required>
-            </div>
-          </div>
-          <div class="form-row">
-            <div>
-              <label for="krCurrent">Current</label>
-              <input id="krCurrent" name="current" type="number" step="any" value="0">
-            </div>
-            <div>
-              <label for="krTimeline">Timeline end</label>
-              <input id="krTimeline" name="timeline" type="date" required>
-            </div>
-            <div>
-              <label for="krConfidence">Confidence</label>
-              <select id="krConfidence" name="confidence" required>
+            <div class="form-row">
+              <div>
+                <label for="krCurrent">Current</label>
+                <input id="krCurrent" name="current" type="number" step="any" value="0">
+              </div>
+              <div>
+                <label for="krTimeline">Timeline end</label>
+                <input id="krTimeline" name="timeline" type="date">
+              </div>
+              <div>
+                <label for="krConfidence">Confidence</label>
+                <select id="krConfidence" name="confidence" required>
                 <option value="On track">On track</option>
                 <option value="At risk">At risk</option>
                 <option value="Off track">Off track</option>
               </select>
             </div>
-          </div>
-          <button class="btn" type="submit">Add key result</button>
-          <p class="hint">Aim for 2–5 key results per objective.</p>
-        </form>
-      </section>
+            </div>
+            <div class="form-row">
+              <label class="checkbox">
+                <input id="krDraft" type="checkbox">
+                Save as draft (fill metric/targets later)
+              </label>
+            </div>
+            <button class="btn" type="submit">Add key result</button>
+            <p class="hint">Aim for 2–5 key results per objective.</p>
+          </form>
+        </section>
 
       <section class="panel">
         <h2>Weekly check-in</h2>
@@ -1101,6 +1113,7 @@
             <div class="meta">
               <span class="tag">${obj.level}</span>
               <span class="tag">${obj.quarter}</span>
+              ${obj.status === 'draft' ? `<span class="tag warn">Draft</span>` : ''}
               ${parent ? `<span class="tag">Maps to: ${parent.title}</span>` : ''}
               <span class="tag">Priority ${obj.priority || '—'}</span>
               <span class="tag">Impact ${obj.impact || '—'}</span>
@@ -1938,11 +1951,15 @@
 
       function setupForm() {
         const form = document.getElementById('objectiveForm');
+        const draftToggle = document.getElementById('objectiveDraft');
+        const description = document.getElementById('description');
+        const rationale = document.getElementById('rationale');
         form.addEventListener('submit', event => {
           event.preventDefault();
           const formData = new FormData(form);
           const payload = Object.fromEntries(formData.entries());
-          payload.status = 'active';
+          const isDraft = draftToggle && draftToggle.checked;
+          payload.status = isDraft ? 'draft' : 'active';
           payload.ownerEmail = state.bootstrap.user.email;
           payload.ownerName = state.bootstrap.user.name;
           google.script.run.withSuccessHandler(() => {
@@ -1955,15 +1972,28 @@
             });
           }).createObjective(payload);
         });
+        if (draftToggle) {
+          draftToggle.addEventListener('change', () => {
+            const isDraft = draftToggle.checked;
+            if (description) description.required = !isDraft;
+            if (rationale) rationale.required = !isDraft;
+          });
+        }
       }
 
       function setupKeyResultForm() {
         const form = document.getElementById('krForm');
+        const draftToggle = document.getElementById('krDraft');
+        const metric = document.getElementById('krMetric');
+        const baseline = document.getElementById('krBaseline');
+        const target = document.getElementById('krTarget');
+        const timeline = document.getElementById('krTimeline');
         form.addEventListener('submit', event => {
           event.preventDefault();
           const formData = new FormData(form);
           const payload = Object.fromEntries(formData.entries());
-          payload.status = 'active';
+          const isDraft = draftToggle && draftToggle.checked;
+          payload.status = isDraft ? 'draft' : 'active';
           payload.ownerEmail = state.bootstrap.user.email;
           google.script.run.withSuccessHandler(() => {
             form.reset();
@@ -1973,6 +2003,15 @@
             });
           }).createKeyResult(payload);
         });
+        if (draftToggle) {
+          draftToggle.addEventListener('change', () => {
+            const isDraft = draftToggle.checked;
+            if (metric) metric.required = !isDraft;
+            if (baseline) baseline.required = !isDraft;
+            if (target) target.required = !isDraft;
+            if (timeline) timeline.required = !isDraft;
+          });
+        }
       }
 
       function setupCheckInForm() {

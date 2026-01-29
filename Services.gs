@@ -600,11 +600,13 @@ function validateObjectivePayload_(payload) {
   if (!payload.quarter) {
     throw new Error('Objective quarter is required.');
   }
-  if (!payload.description) {
-    throw new Error('Objective description is required.');
-  }
-  if (!payload.rationale) {
-    throw new Error('Objective rationale is required.');
+  if (payload.status !== 'draft') {
+    if (!payload.description) {
+      throw new Error('Objective description is required.');
+    }
+    if (!payload.rationale) {
+      throw new Error('Objective rationale is required.');
+    }
   }
   if (payload.level === 'Department' && !payload.parentId) {
     throw new Error('Department objectives must map to an executive objective.');
@@ -621,17 +623,19 @@ function validateKeyResultPayload_(payload) {
   if (!payload.title) {
     throw new Error('Key Result title is required.');
   }
-  if (!payload.metric) {
-    throw new Error('Key Result metric is required.');
-  }
-  if (!payload.baseline && payload.baseline !== 0) {
-    throw new Error('Key Result baseline is required.');
-  }
-  if (!payload.target && payload.target !== 0) {
-    throw new Error('Key Result target is required.');
-  }
-  if (!payload.timeline) {
-    throw new Error('Key Result timeline is required.');
+  if (payload.status !== 'draft') {
+    if (!payload.metric) {
+      throw new Error('Key Result metric is required.');
+    }
+    if (!payload.baseline && payload.baseline !== 0) {
+      throw new Error('Key Result baseline is required.');
+    }
+    if (!payload.target && payload.target !== 0) {
+      throw new Error('Key Result target is required.');
+    }
+    if (!payload.timeline) {
+      throw new Error('Key Result timeline is required.');
+    }
   }
 }
 
