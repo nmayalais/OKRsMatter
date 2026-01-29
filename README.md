@@ -10,6 +10,18 @@ OKRsMatter is a lightweight OKR web app built on Google Apps Script with a Googl
 - **Storage**: One Google Sheet with tabs matching the schema below.
 - **Deployment**: Apps Script Web App (execute as user accessing the app).
 
+## Architecture diagram
+```mermaid
+flowchart LR
+  User[User Browser] -->|Web App URL| WebApp[Apps Script Web App]
+  WebApp -->|HtmlService| UI[HTML/JS UI]
+  UI -->|google.script.run| Services[Services.gs API]
+  Services -->|Read/Write| Sheets[Google Sheets Data Store]
+  Services -->|Auth + Settings| Props[Script Properties]
+  UI -->|Optional| Coach[AI Coach Provider]
+  Coach -->|Feedback JSON| UI
+```
+
 ---
 
 ## Repository layout
