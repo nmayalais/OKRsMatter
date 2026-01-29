@@ -116,6 +116,20 @@ Set these in **Project Settings → Script Properties**:
 
 AI settings are visible to users with roles `exec` or `operations`.
 
+## Security & secrets hygiene
+Never commit secrets or identifiers that grant access. Keep them in **Script Properties** or local `.clasp.json` only.
+
+Do **not** commit:
+- API keys or tokens
+- Spreadsheet IDs or URLs
+- `.clasp.json`
+- OAuth credentials
+
+Recommended practices:
+- Keep `.clasp.json` in `.gitignore`
+- Use `.env` files locally if needed (and ignore them)
+- Review `git status` before pushing
+- Avoid debug endpoints that expose script IDs or sheet URLs
 ---
 
 ## Data import & cleanup
