@@ -283,6 +283,23 @@
         margin-left: 6px;
       }
 
+      .quick-checkin {
+        margin-top: 8px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .quick-checkin input,
+      .quick-checkin select {
+        padding: 8px 10px;
+        border-radius: 10px;
+        border: 1px solid rgba(30, 46, 63, 0.15);
+        background: #fff;
+        font-size: 0.9rem;
+      }
+
       .alignment-map {
         display: grid;
         gap: 10px;
@@ -1145,15 +1162,34 @@
           }
           const krCap = state.appSettings ? state.appSettings.krSoftCap : 5;
           if (warning) warning.style.display = results.length > krCap ? 'block' : 'none';
-          container.innerHTML = results.map(kr => `
+          container.innerHTML = results.map(kr => {
+            const latestCheckIn = getLatestCheckInForKr_(kr.id);
+            const currentValue = latestCheckIn && latestCheckIn.current !== undefined && latestCheckIn.current !== null
+              ? latestCheckIn.current
+              : (kr.current !== undefined && kr.current !== null ? kr.current : '');
+            const confidenceValue = latestCheckIn && latestCheckIn.confidence
+              ? latestCheckIn.confidence
+              : (kr.confidence || 'On track');
+            return `
             <div class="kr-item">
               <div class="kr-meta">
                 <span>${kr.title}</span>
                 <span class="hint">${kr.metric}: ${kr.baseline || 0} → ${kr.target || 0} by ${kr.timeline || 'end of quarter'}</span>
               </div>
               <span class="status">${kr.current || 0}/${kr.target || 0} (${kr.confidence || 'No status'})</span>
+              <div class="quick-checkin" data-kr-id="${kr.id}">
+                <input class="quick-current" type="number" step="any" placeholder="Current" value="${currentValue}">
+                <select class="quick-confidence">
+                  <option value="On track" ${confidenceValue === 'On track' ? 'selected' : ''}>On track</option>
+                  <option value="At risk" ${confidenceValue === 'At risk' ? 'selected' : ''}>At risk</option>
+                  <option value="Off track" ${confidenceValue === 'Off track' ? 'selected' : ''}>Off track</option>
+                </select>
+                <button class="btn secondary quick-save" type="button">Save check-in</button>
+              </div>
             </div>
-          `).join('');
+          `;
+          }).join('');
+          setupQuickCheckIns(container);
           renderDashboard();
         }).listKeyResults(objectiveId);
       }
@@ -1278,6 +1314,7 @@
             </div>
           </details>
         `).join('');
+        setupQuickCheckIns(container);
       }
 
       function computeSummary() {
@@ -1488,10 +1525,25 @@
           const checkInText = latestCheckIn
             ? `Latest check-in ${latestCheckIn.weekStart} · ${latestCheckIn.current} · ${latestCheckIn.confidence}`
             : 'No check-ins yet';
+          const currentValue = latestCheckIn && latestCheckIn.current !== undefined && latestCheckIn.current !== null
+            ? latestCheckIn.current
+            : (kr.current !== undefined && kr.current !== null ? kr.current : '');
+          const confidenceValue = latestCheckIn && latestCheckIn.confidence
+            ? latestCheckIn.confidence
+            : (kr.confidence || 'On track');
           return `
             <div class="objective-kr">
               <div><strong>${kr.title}</strong> · ${kr.metric}: ${kr.baseline || 0} → ${kr.target || 0} by ${kr.timeline || 'quarter end'} ${badge}</div>
               <div>${checkInText}</div>
+              <div class="quick-checkin" data-kr-id="${kr.id}">
+                <input class="quick-current" type="number" step="any" placeholder="Current" value="${currentValue}">
+                <select class="quick-confidence">
+                  <option value="On track" ${confidenceValue === 'On track' ? 'selected' : ''}>On track</option>
+                  <option value="At risk" ${confidenceValue === 'At risk' ? 'selected' : ''}>At risk</option>
+                  <option value="Off track" ${confidenceValue === 'Off track' ? 'selected' : ''}>Off track</option>
+                </select>
+                <button class="btn secondary quick-save" type="button">Save check-in</button>
+              </div>
             </div>
           `;
         }).join('');
@@ -2031,6 +2083,59 @@
               objectiveId: payload.objectiveId
             });
           }).createCheckIn(payload);
+        });
+      }
+
+      function setupQuickCheckIns(container) {
+        const scope = container || document;
+        const nodes = scope.querySelectorAll('.quick-checkin');
+        nodes.forEach(node => {
+          if (node.dataset.bound === 'true') return;
+          node.dataset.bound = 'true';
+          const button = node.querySelector('.quick-save');
+          const currentInput = node.querySelector('.quick-current');
+          const confidenceSelect = node.querySelector('.quick-confidence');
+          if (!button) return;
+          button.addEventListener('click', () => {
+            const krId = node.dataset.krId;
+            if (!krId) return;
+            const current = currentInput ? currentInput.value : '';
+            const confidence = confidenceSelect ? confidenceSelect.value : '';
+            const payload = {
+              keyResultId: krId,
+              current,
+              confidence,
+              weekStart: getWeekStartString_(new Date()),
+              ownerEmail: state.bootstrap.user.email
+            };
+            const selectedKr = state.keyResultsAll.find(kr => kr.id === krId);
+            payload.objectiveId = selectedKr ? selectedKr.objectiveId : '';
+            button.disabled = true;
+            button.textContent = 'Saving...';
+            google.script.run.withSuccessHandler(result => {
+              button.disabled = false;
+              button.textContent = 'Save check-in';
+              if (result && result.checkIn) {
+                state.checkIns = [result.checkIn].concat(state.checkIns || []);
+              }
+              if (result && result.keyResult) {
+                state.keyResultsAll = (state.keyResultsAll || []).map(kr => {
+                  if (kr.id !== result.keyResult.id) return kr;
+                  return result.keyResult;
+                });
+              }
+              renderObjectives();
+              renderAlignmentMap();
+              logClientEvent('checkin_created', {
+                keyResultId: payload.keyResultId,
+                objectiveId: payload.objectiveId
+              });
+            }).withFailureHandler(() => {
+              button.disabled = false;
+              button.textContent = 'Save check-in';
+              alert('Check-in failed. Please try again.');
+            }).createCheckIn(payload);
+          });
         });
       }
 
